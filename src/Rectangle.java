@@ -14,6 +14,9 @@ public class Rectangle {
         this.startingPoint = startingPoint;
     }
 
+    public int getWidth(){
+        return width;
+    }
     public void updateCard(Card newCard){
         card = newCard;
     }
@@ -29,5 +32,16 @@ public class Rectangle {
         // draw the rectangle given the top left point and width and height
         //g.drawRect(startingPoint.x, startingPoint.y, width, height); // the getter methods here are INHERITED FROM SHAPE!
         g.fillRect(startingPoint.x, startingPoint.y, width, height);
+    }
+
+    public void draw(Graphics g, String cardVal) {
+        // set the color
+        g.setColor(Color.WHITE);
+
+        // draw the rectangle given the top left point and width and height
+        //g.drawRect(startingPoint.x, startingPoint.y, width, height); // the getter methods here are INHERITED FROM SHAPE!
+        g.fillRect(startingPoint.x, startingPoint.y, width, height);
+
+
     }
 }

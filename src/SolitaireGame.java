@@ -26,7 +26,7 @@ public class SolitaireGame {
         return foundations;
     }
 
-    private void startUp(){
+    public void startUp(){
         scan = new Scanner(System.in);
         foundations = new Foundation[]{new Foundation("d"), new Foundation("h"),
                 new Foundation("C"), new Foundation("S")};

@@ -5,7 +5,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-import javax.swing.JComponent;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class GameComponent extends JComponent {
 
@@ -20,6 +24,7 @@ public class GameComponent extends JComponent {
         this.width = width;
         this.height = height;
         solitaireGame = new SolitaireGame();
+        solitaireGame.startUp();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
 
@@ -63,11 +68,21 @@ public class GameComponent extends JComponent {
         Rectangle rectToAdd;
         for (Foundation foundation : foundations){
             rectToAdd = new Rectangle(null, new Point(initialX + 20 , initialY));
-            initialX += 20;
-            rectToAdd.draw(g);
+            initialX += 20 + rectToAdd.getWidth();
+            rectToAdd.draw(g, foundation.getSuit());
         }
 
-
+        try {
+            BufferedImage bufferedImage = ImageIO.read(new File("src/SuitDiamonds.svg"));
+            Image image = bufferedImage.getScaledInstance(800, 500, Image.SCALE_DEFAULT);
+            ImageIcon icon = new ImageIcon(image);
+            JLabel jLabel = new JLabel();
+            jLabel.setIcon(icon);
+            add(jLabel);
+            setVisible(true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
     }
