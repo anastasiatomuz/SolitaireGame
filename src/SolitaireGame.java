@@ -22,6 +22,10 @@ public class SolitaireGame {
         }
     }
 
+    public Foundation[] getFoundations(){
+        return foundations;
+    }
+
     private void startUp(){
         scan = new Scanner(System.in);
         foundations = new Foundation[]{new Foundation("d"), new Foundation("h"),
@@ -292,4 +296,6 @@ public class SolitaireGame {
 
         System.out.println(actionStatement);
     }
+
+
 }
