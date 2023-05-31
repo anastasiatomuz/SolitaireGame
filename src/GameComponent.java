@@ -20,11 +20,16 @@ public class GameComponent extends JComponent {
 
     private Foundation[] foundations;
 
+    private JLabel picLabel;
+
+    private TableauStack[] tableau;
+
     public GameComponent(int width, int height) {
         this.width = width;
         this.height = height;
         solitaireGame = new SolitaireGame();
         solitaireGame.startUp();
+        tableau = solitaireGame.getTableau();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
 
@@ -47,6 +52,14 @@ public class GameComponent extends JComponent {
         /*
         addMouseMotionListener(new MyMouseMotionAdapter());
         */
+
+
+        //testing images
+        picLabel = new JLabel(new ImageIcon("C:\\Users\\student\\IdeaProjects\\SolitaireGraphicsPlayground\\src\\diamond.png"));
+        picLabel.setLocation(100, 100);
+        add(picLabel);
+
+
     }
 
 
@@ -56,6 +69,7 @@ public class GameComponent extends JComponent {
      */
     @Override
     public void paintComponent (Graphics g) {
+        super.paintComponent(g);
         height = getHeight();
         int width = getWidth();
 
@@ -67,10 +81,44 @@ public class GameComponent extends JComponent {
         int initialY = 23;
         Rectangle rectToAdd;
         for (Foundation foundation : foundations){
-            rectToAdd = new Rectangle(null, new Point(initialX + 20 , initialY));
+            rectToAdd = new Rectangle(null, new Point(initialX + 20 , initialY), false);
             initialX += 20 + rectToAdd.getWidth();
             rectToAdd.draw(g, foundation.getSuit());
         }
+
+        //stack
+        rectToAdd = new Rectangle(null, new Point(initialX + 200 , initialY), false);
+        rectToAdd.draw(g, "empty");
+        //waste
+        rectToAdd = new Rectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false);
+        rectToAdd.draw(g, "empty");
+
+
+        //tableau
+        initialX = 30 + 20 ;
+        for (TableauStack tableauStack : tableau){
+            initialY = 23 + 140 + 40;
+            ArrayList<Card> cards = tableauStack.getStack();
+            for (int i = 0; i < cards.size(); i ++){
+                boolean halfHidden = false;
+                if (i != cards.size() - 1){
+                   halfHidden = true;
+                }
+                rectToAdd = new Rectangle(cards.get(i), new Point(initialX , initialY), halfHidden);
+                rectToAdd.draw(g);
+                if (halfHidden){
+                    initialY += 40;
+                } else {
+                    initialY += 140;
+                }
+            }
+            initialX += 100 + 20;//width of card and of space between tableau stacks
+        }
+
+
+
+
+
 
 //        BufferedImage wPic = ImageIO.read(this.getClass().getResource("diamond.png"));
 //        JLabel wIcon = new JLabel(new ImageIcon(wPic));
@@ -81,8 +129,7 @@ public class GameComponent extends JComponent {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-//        JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-//        add(picLabel);
+
 
 
 //        try {

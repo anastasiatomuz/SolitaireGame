@@ -26,6 +26,10 @@ public class SolitaireGame {
         return foundations;
     }
 
+    public TableauStack[] getTableau(){
+        return tableau;
+    }
+
     public void startUp(){
         scan = new Scanner(System.in);
         foundations = new Foundation[]{new Foundation("d"), new Foundation("h"),
