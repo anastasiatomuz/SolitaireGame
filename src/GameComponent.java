@@ -72,17 +72,30 @@ public class GameComponent extends JComponent {
             rectToAdd.draw(g, foundation.getSuit());
         }
 
-        try {
-            BufferedImage bufferedImage = ImageIO.read(new File("src/SuitDiamonds.svg"));
-            Image image = bufferedImage.getScaledInstance(800, 500, Image.SCALE_DEFAULT);
-            ImageIcon icon = new ImageIcon(image);
-            JLabel jLabel = new JLabel();
-            jLabel.setIcon(icon);
-            add(jLabel);
-            setVisible(true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        BufferedImage wPic = ImageIO.read(this.getClass().getResource("diamond.png"));
+//        JLabel wIcon = new JLabel(new ImageIcon(wPic));
+
+//        BufferedImage myPicture = null;
+//        try {
+//            myPicture = ImageIO.read(new File("C:/Users/tgs34/IdeaProjects/SolitaireGraphicsPlayground/src/"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+//        add(picLabel);
+
+
+//        try {
+//            BufferedImage bufferedImage = ImageIO.read(new File("src/SuitDiamonds.svg"));
+//            Image image = bufferedImage.getScaledInstance(800, 500, Image.SCALE_DEFAULT);
+//            ImageIcon icon = new ImageIcon(image);
+//            JLabel jLabel = new JLabel();
+//            jLabel.setIcon(icon);
+//            add(jLabel);
+//            setVisible(true);
+//        } catch (IOException e) {
+//            System.out.println(e);
+//        }
 
 
     }
