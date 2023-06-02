@@ -53,6 +53,8 @@ public class MyRectangle extends Rectangle {
         if (halfHidden){
             changeCardType(false);//make card half-hidden dimensions
             g.fillRect(startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
+            g.setColor(Color.BLACK);
+            g.drawRect(startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
             if (card.isVisible()){
                 g.setColor(Color.BLACK);
                 g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + smallerHeight /2);

@@ -23,7 +23,7 @@ public class GameComponent extends JComponent {
 
     private TextPanel textPanel;
 
-    public GameComponent(int width, int height) {
+    public GameComponent(int width, int height, TextPanel textPanel) {
         this.width = width;
         this.height = height;
         solitaireGame = new SolitaireGame();
@@ -31,8 +31,7 @@ public class GameComponent extends JComponent {
         tableau = solitaireGame.getTableau();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
-        textPanel = new TextPanel(this);
-
+        this.textPanel = textPanel;
         init();  // call helper method to do rest of setup
     }
 
@@ -59,7 +58,7 @@ public class GameComponent extends JComponent {
         picLabel.setLocation(100, 100);
         add(picLabel);
 
-        textPanel.updateText("you clicked the stack!");
+
     }
 
 
@@ -158,7 +157,8 @@ public class GameComponent extends JComponent {
             System.out.println("" + currX + " " + currY);
 
             if (stack.contains(e.getPoint())){
-                System.out.println("you clicked the stack!");
+                //System.out.println("you clicked the stack!");
+                //textPanel.getTextArea().append("does this work");
                 textPanel.updateText("you clicked the stack!");
             }
 

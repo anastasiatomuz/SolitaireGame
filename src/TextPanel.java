@@ -1,8 +1,9 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class TextPanel extends JPanel {
 
-    private GameComponent gameComponent;
+
     private JLabel messageLabel;
     private JTextArea messageArea;
 
@@ -10,8 +11,8 @@ public class TextPanel extends JPanel {
         return messageArea;
     }
 
-    public TextPanel (GameComponent gameComponent){
-        this.gameComponent = gameComponent;
+    public TextPanel (){
+
         messageLabel = new JLabel("Message");
         add(messageLabel);
 
@@ -19,10 +20,14 @@ public class TextPanel extends JPanel {
         messageArea = new JTextArea("No message yet", 4, 60);
         messageArea.setEditable(true);
         add(messageArea);
-
+        updateText("testing testing");
 
 
         // initialize the panel using the init() private helper method
+    }
+
+    public JTextArea getTextArea(){
+        return messageArea;
     }
 
     public void updateText(String toDisplay){
