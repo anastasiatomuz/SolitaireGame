@@ -1,15 +1,8 @@
-import org.w3c.dom.css.Rect;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class GameComponent extends JComponent {
 
@@ -24,6 +17,12 @@ public class GameComponent extends JComponent {
 
     private TableauStack[] tableau;
 
+    private MyRectangle stack;
+
+    private MyRectangle waste;
+
+    private TextPanel textPanel;
+
     public GameComponent(int width, int height) {
         this.width = width;
         this.height = height;
@@ -32,6 +31,7 @@ public class GameComponent extends JComponent {
         tableau = solitaireGame.getTableau();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
+        textPanel = new TextPanel(this);
 
         init();  // call helper method to do rest of setup
     }
@@ -59,7 +59,7 @@ public class GameComponent extends JComponent {
         picLabel.setLocation(100, 100);
         add(picLabel);
 
-
+        textPanel.updateText("you clicked the stack!");
     }
 
 
@@ -79,19 +79,19 @@ public class GameComponent extends JComponent {
 
         int initialX = 30;
         int initialY = 23;
-        Rectangle rectToAdd;
+        MyRectangle rectToAdd;
         for (Foundation foundation : foundations){
-            rectToAdd = new Rectangle(null, new Point(initialX + 20 , initialY), false);
+            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false);
             initialX += 20 + rectToAdd.getWidth();
             rectToAdd.draw(g, foundation.getSuit());
         }
 
         //stack
-        rectToAdd = new Rectangle(null, new Point(initialX + 200 , initialY), false);
-        rectToAdd.draw(g, "empty");
+        stack = new MyRectangle(null, new Point(initialX + 200 , initialY), false);
+        stack.draw(g, "full");
         //waste
-        rectToAdd = new Rectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false);
-        rectToAdd.draw(g, "empty");
+        waste = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false);
+        waste.draw(g, "empty");
 
 
         //tableau
@@ -104,7 +104,7 @@ public class GameComponent extends JComponent {
                 if (i != cards.size() - 1){
                    halfHidden = true;
                 }
-                rectToAdd = new Rectangle(cards.get(i), new Point(initialX , initialY), halfHidden);
+                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden);
                 rectToAdd.draw(g);
                 if (halfHidden){
                     initialY += 40;
@@ -153,8 +153,14 @@ public class GameComponent extends JComponent {
         public void mousePressed(MouseEvent e) {
             int currX = e.getX();
             int currY = e.getY();
+            Point pointClicked = new Point(currX, currY);
 
             System.out.println("" + currX + " " + currY);
+
+            if (stack.contains(e.getPoint())){
+                System.out.println("you clicked the stack!");
+                textPanel.updateText("you clicked the stack!");
+            }
 
             // repaint all
             repaint();

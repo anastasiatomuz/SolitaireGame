@@ -6,6 +6,10 @@ public class TextPanel extends JPanel {
     private JLabel messageLabel;
     private JTextArea messageArea;
 
+    public JTextArea getTA() {
+        return messageArea;
+    }
+
     public TextPanel (GameComponent gameComponent){
         this.gameComponent = gameComponent;
         messageLabel = new JLabel("Message");
@@ -13,7 +17,7 @@ public class TextPanel extends JPanel {
 
 
         messageArea = new JTextArea("No message yet", 4, 60);
-        messageArea.setEditable(false);
+        messageArea.setEditable(true);
         add(messageArea);
 
 
@@ -22,6 +26,7 @@ public class TextPanel extends JPanel {
     }
 
     public void updateText(String toDisplay){
+        System.out.println("here: " + messageArea);
         messageArea.setText(toDisplay);
     }
 }
