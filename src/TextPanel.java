@@ -1,24 +1,33 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class TextPanel extends JPanel {
 
-    private GameComponent gameComponent;
+
     private JLabel messageLabel;
     private JTextArea messageArea;
 
-    public TextPanel (GameComponent gameComponent){
-        this.gameComponent = gameComponent;
+    public JTextArea getTA() {
+        return messageArea;
+    }
+
+    public TextPanel (){
+
         messageLabel = new JLabel("Message");
         add(messageLabel);
 
 
         messageArea = new JTextArea("No message yet", 4, 60);
-        messageArea.setEditable(false);
+        messageArea.setEditable(true);
         add(messageArea);
-
+        updateText("testing testing");
 
 
         // initialize the panel using the init() private helper method
+    }
+
+    public JTextArea getTextArea(){
+        return messageArea;
     }
 
     public void updateText(String toDisplay){

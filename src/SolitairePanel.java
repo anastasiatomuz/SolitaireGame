@@ -5,8 +5,9 @@ public class SolitairePanel extends JPanel {
     private TextPanel textPanel;
 
     public SolitairePanel(){
-        gameComponent = new GameComponent(1000, 600);
-        textPanel = new TextPanel(gameComponent);
+        textPanel = new TextPanel();
+        gameComponent = new GameComponent(1000, 600,textPanel);
+
         init();
     }
 

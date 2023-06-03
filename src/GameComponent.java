@@ -1,15 +1,9 @@
-import org.w3c.dom.css.Rect;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class GameComponent extends JComponent {
 
@@ -20,14 +14,25 @@ public class GameComponent extends JComponent {
 
     private Foundation[] foundations;
 
-    public GameComponent(int width, int height) {
+    private JLabel picLabel;
+
+    private TableauStack[] tableau;
+
+    private MyRectangle stack;
+
+    private MyRectangle waste;
+
+    private TextPanel textPanel;
+
+    public GameComponent(int width, int height, TextPanel textPanel) {
         this.width = width;
         this.height = height;
         solitaireGame = new SolitaireGame();
         solitaireGame.startUp();
+        tableau = solitaireGame.getTableau();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
-
+        this.textPanel = textPanel;
         init();  // call helper method to do rest of setup
     }
 
@@ -47,6 +52,14 @@ public class GameComponent extends JComponent {
         /*
         addMouseMotionListener(new MyMouseMotionAdapter());
         */
+
+
+        //testing images
+        picLabel = new JLabel(new ImageIcon("C:\\Users\\student\\IdeaProjects\\SolitaireGraphicsPlayground\\src\\diamond.png"));
+        picLabel.setLocation(100, 100);
+        add(picLabel);
+
+
     }
 
 
@@ -56,6 +69,7 @@ public class GameComponent extends JComponent {
      */
     @Override
     public void paintComponent (Graphics g) {
+        super.paintComponent(g);
         height = getHeight();
         int width = getWidth();
 
@@ -65,12 +79,58 @@ public class GameComponent extends JComponent {
 
         int initialX = 30;
         int initialY = 23;
-        Rectangle rectToAdd;
+        MyRectangle rectToAdd;
         for (Foundation foundation : foundations){
-            rectToAdd = new Rectangle(null, new Point(initialX + 20 , initialY));
+            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false);
             initialX += 20 + rectToAdd.getWidth();
-            rectToAdd.draw(g, foundation.getSuit());
+            try {
+                rectToAdd.draw(g, foundation.getSuit());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        //stack
+        stack = new MyRectangle(null, new Point(initialX + 200 , initialY), false);
+        try {
+            stack.draw(g, "full");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //waste
+        waste = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false);
+        try {
+            waste.draw(g, "empty");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //tableau
+        initialX = 30 + 20 ;
+        for (TableauStack tableauStack : tableau){
+            initialY = 23 + 140 + 40;
+            ArrayList<Card> cards = tableauStack.getStack();
+            for (int i = 0; i < cards.size(); i ++){
+                boolean halfHidden = false;
+                if (i != cards.size() - 1){
+                   halfHidden = true;
+                }
+                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden);
+                rectToAdd.draw(g);
+                if (halfHidden){
+                    initialY += 40;
+                } else {
+                    initialY += 140;
+                }
+            }
+            initialX += 100 + 20;//width of card and of space between tableau stacks
+        }
+
+
+
+
+
 
 //        BufferedImage wPic = ImageIO.read(this.getClass().getResource("diamond.png"));
 //        JLabel wIcon = new JLabel(new ImageIcon(wPic));
@@ -81,8 +141,7 @@ public class GameComponent extends JComponent {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-//        JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-//        add(picLabel);
+
 
 
 //        try {
@@ -106,8 +165,13 @@ public class GameComponent extends JComponent {
         public void mousePressed(MouseEvent e) {
             int currX = e.getX();
             int currY = e.getY();
+            Point pointClicked = new Point(currX, currY);
 
             System.out.println("" + currX + " " + currY);
+
+            if (stack.contains(e.getPoint())){
+                textPanel.updateText("you clicked the stack!");
+            }
 
             // repaint all
             repaint();
