@@ -18,11 +18,15 @@ public class GameComponent extends JComponent {
 
     private TableauStack[] tableau;
 
-    private MyRectangle stack;
+    private MyRectangle stockRect;
 
-    private MyRectangle waste;
+    private MyRectangle wasteRect;
 
     private TextPanel textPanel;
+
+    private ArrayList<MyRectangle> tableauRectangles;
+
+    private ArrayList<MyRectangle> foundationRectangles;
 
     public GameComponent(int width, int height, TextPanel textPanel) {
         this.width = width;
@@ -33,6 +37,8 @@ public class GameComponent extends JComponent {
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
         this.textPanel = textPanel;
+        tableauRectangles = new ArrayList<>();
+        foundationRectangles = new ArrayList<>(4);
         init();  // call helper method to do rest of setup
     }
 
@@ -81,26 +87,27 @@ public class GameComponent extends JComponent {
         int initialY = 23;
         MyRectangle rectToAdd;
         for (Foundation foundation : foundations){
-            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false);
+            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false, foundation.getSuit());
             initialX += 20 + rectToAdd.getWidth();
             try {
                 rectToAdd.draw(g, foundation.getSuit());
+                foundationRectangles.add(rectToAdd);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        //stack
-        stack = new MyRectangle(null, new Point(initialX + 200 , initialY), false);
+        //stock
+        stockRect = new MyRectangle(null, new Point(initialX + 200 , initialY), false, "stock");
         try {
-            stack.draw(g, "full");
+            stockRect.draw(g, "full");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         //waste
-        waste = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false);
+        wasteRect = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false, "waste");
         try {
-            waste.draw(g, "empty");
+            wasteRect.draw(g, "empty");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,8 +123,9 @@ public class GameComponent extends JComponent {
                 if (i != cards.size() - 1){
                    halfHidden = true;
                 }
-                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden);
+                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden, "playingCard");
                 rectToAdd.draw(g);
+                tableauRectangles.add(rectToAdd);
                 if (halfHidden){
                     initialY += 40;
                 } else {
@@ -165,13 +173,33 @@ public class GameComponent extends JComponent {
         public void mousePressed(MouseEvent e) {
             int currX = e.getX();
             int currY = e.getY();
-            Point pointClicked = new Point(currX, currY);
+            Point clickedPoint = e.getPoint();
 
             System.out.println("" + currX + " " + currY);
 
-            if (stack.contains(e.getPoint())){
-                textPanel.updateText("you clicked the stack!");
+            for (MyRectangle foundation : foundationRectangles){
+                if (foundation.contains(clickedPoint)){
+                    textPanel.updateText("you clicked the " + foundation.getLabel() + "foundation!\n" +
+                            "You can't move this card!");
+                }
             }
+
+            if (stockRect.contains(e.getPoint())){
+                textPanel.updateText("You clicked the stack!");
+            }
+
+            if (stockRect.contains(e.getPoint())){
+                textPanel.updateText("You clicked the waste!");
+            }
+
+            for (MyRectangle rect : tableauRectangles){
+                if (rect.contains(clickedPoint)){
+                    textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+                }
+
+
+            }
+
 
             // repaint all
             repaint();

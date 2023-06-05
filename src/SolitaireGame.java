@@ -301,5 +301,9 @@ public class SolitaireGame {
         System.out.println(actionStatement);
     }
 
+    public ArrayList<Card> getStock(){
+        return stock;
+    }
+
 
 }
