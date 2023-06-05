@@ -124,7 +124,11 @@ public class GameComponent extends JComponent {
                    halfHidden = true;
                 }
                 rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden, "playingCard");
-                rectToAdd.draw(g);
+                try {
+                    rectToAdd.draw(g);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 tableauRectangles.add(rectToAdd);
                 if (halfHidden){
                     initialY += 40;
@@ -179,7 +183,7 @@ public class GameComponent extends JComponent {
 
             for (MyRectangle foundation : foundationRectangles){
                 if (foundation.contains(clickedPoint)){
-                    textPanel.updateText("you clicked the " + foundation.getLabel() + "foundation!\n" +
+                    textPanel.updateText("you clicked the " + foundation.getLabel() + " foundation!\n" +
                             "You can't move this card!");
                 }
             }
@@ -188,13 +192,18 @@ public class GameComponent extends JComponent {
                 textPanel.updateText("You clicked the stack!");
             }
 
-            if (stockRect.contains(e.getPoint())){
+            if (wasteRect.contains(e.getPoint())){
                 textPanel.updateText("You clicked the waste!");
             }
 
             for (MyRectangle rect : tableauRectangles){
                 if (rect.contains(clickedPoint)){
-                    textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+                    if (rect.getCard().isVisible()){
+                        textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+                    } else {
+                        textPanel.updateText("You clicked a card that is hidden");
+                    }
+
                 }
 
 

@@ -30,7 +30,17 @@ public class MyRectangle extends Rectangle {
         this.startingPoint = startingPoint;
         this.halfHidden = halfHidden;
         this.currentDimension = FULL_DIMENSION;
-        this.label = label;
+        if (label.equals("d")){
+            this.label = "diamonds";
+        } else if (label.equals("h")){
+            this.label = "hearts";
+        } else if (label.equals("C")){
+            this.label = "clubs";
+        } else if (label.equals("S")){
+            this.label = "spades";
+        } else {
+            this.label = label;
+        }
     }
 
     public void changeCardType(boolean fullSize){
@@ -53,7 +63,7 @@ public class MyRectangle extends Rectangle {
         return label;
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g) throws IOException {
         Color color;
         if (card.isVisible()){
             color = Color.white;
@@ -66,8 +76,11 @@ public class MyRectangle extends Rectangle {
             changeCardType(false);//make card half-hidden dimensions
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
             if (card.isVisible()){
+                generateCroppedImage(g, card.getImageName());
                 g.setColor(Color.BLACK);
                 g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + smallerHeight /2);
+            } else {
+                generateCroppedImage(g, "back_of_card");
             }
         } else {
             changeCardType(true);//make card half-hidden dimensions
@@ -76,6 +89,9 @@ public class MyRectangle extends Rectangle {
             if (card.isVisible()){
                 g.setColor(Color.BLACK);
                 g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + height /2);
+                generateImage(g, card.getImageName());
+            } else {
+                generateImage(g,"back_of_image");
             }
         }
     }
@@ -85,21 +101,17 @@ public class MyRectangle extends Rectangle {
             g.setColor(Color.GRAY);
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
 
-            //IMPORTANT for setting an image in a rectangle
-            //https://stackoverflow.com/questions/9864267/loading-resources-like-images-while-running-project-distributed-as-jar-archive/9866659#9866659
-            //https://www.baeldung.com/java-resize-image
-           //
-            generateImage(g, "back_of_card");
+
 
         } else if (cardVal.equals("full")){
             g.setColor(Color.PINK);
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
+            generateImage(g, "back_of_card");
         } else {
             // set the color
             g.setColor(Color.WHITE);
 
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
-
             if (cardVal.equals("d") || cardVal.equals("h")){
                 g.setColor(Color.RED);
             } else if (cardVal.equals("C") || cardVal.equals("S")) {
@@ -125,7 +137,12 @@ public class MyRectangle extends Rectangle {
     }
 
     public void generateImage(Graphics g, String cardImageName) throws IOException {
+        //IMPORTANT for setting an image in a rectangle
+        //https://stackoverflow.com/questions/9864267/loading-resources-like-images-while-running-project-distributed-as-jar-archive/9866659#9866659
+        //https://www.baeldung.com/java-resize-image
+        //
         String loc = "/resources/images/" + cardImageName + ".png";
+        System.out.println(cardImageName);
 
         BufferedImage image = ImageIO.read(Objects.requireNonNull(getClass().getResource(loc)));
 

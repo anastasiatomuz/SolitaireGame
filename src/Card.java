@@ -65,4 +65,32 @@ public class Card {
         }
         return "black";
     }
+
+    public String getImageName(){
+        String val = "";
+        if (value.equals("A")){
+            val = "ace";
+        } else if (value.equals("J")){
+            val = "jack";
+        } else if (value.equals("Q")){
+            val = "queen";
+        } else if (value.equals("K")){
+            val = "king";
+        } else {
+            val = "" + value;
+        }
+
+        String suitOfCard = "";
+        if (suit.equals("d")){
+            suitOfCard = "diamonds";
+        } else if (suit.equals("h")){
+            suitOfCard = "hearts";
+        } else if (suit.equals("C")){
+            suitOfCard = "clubs";
+        } else {
+            suitOfCard = "spades";
+        }
+
+        return val + "_of_" + suitOfCard;
+    }
 }
