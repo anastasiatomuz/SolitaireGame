@@ -2,6 +2,10 @@ import javax.swing.JFrame;
 
 public class SolitaireRunner {
     public static void main (String args[]) {
+        SolitaireGame game = new SolitaireGame();
+
+        /*
+
         // create a frame (main application window)
         JFrame frame = new JFrame();
 
@@ -16,5 +20,7 @@ public class SolitaireRunner {
         // set the frame so that when the user closes the window
         // using the X button in the top right, the program stops
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+         */
     }
 }

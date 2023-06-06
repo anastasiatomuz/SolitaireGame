@@ -1,5 +1,6 @@
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class SolitaireGame {
@@ -10,7 +11,81 @@ public class SolitaireGame {
     private Card topWasteCard;
     private Scanner scan;
 
+    private MyRectangle stockRect;
 
+    private MyRectangle wasteRect;
+
+    private ArrayList<ArrayList<MyRectangle>> tableauRectangles;
+
+    private ArrayList<MyRectangle> foundationRectangles;
+
+
+    private GameComponent gameComponent;
+
+    private TextPanel textPanel;
+
+    public SolitaireGame(){
+        // create a frame (main application window)
+        JFrame frame = new JFrame();
+
+        // create a Shape Panel
+        SolitairePanel solitairePanel = new SolitairePanel(this);
+
+        // add the shapePanel to the frame
+        frame.add(solitairePanel);
+        frame.pack();         // shrink to fit preferred size
+        frame.setVisible(true); // show the frame
+
+        gameComponent = solitairePanel.getGameComponent();
+        textPanel = solitairePanel.getTextPanel();
+        setUpLayout();
+
+        // set the frame so that when the user closes the window
+        // using the X button in the top right, the program stops
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+
+    public void setUpLayout(){
+        startUp();
+        int initialX = 30;
+        int initialY = 23;
+        MyRectangle rectToAdd;
+        for (Foundation foundation : foundations){
+            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false, foundation.getSuit());
+            initialX += 20 + rectToAdd.getWidth();
+            foundationRectangles.add(rectToAdd);
+        }
+
+        //creating rectangle object for stack and waste piles
+        stockRect = new MyRectangle(null, new Point(initialX + 200 , initialY), false, "stock");
+        wasteRect = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false, "waste");
+
+
+        //creating rectangle object for the cards of the tableau
+        initialX = 30 + 20 ;
+        for (TableauStack tableauStack : tableau){
+            initialY = 23 + 140 + 40;
+            ArrayList<Card> cards = tableauStack.getStack();
+            ArrayList<MyRectangle> rectsToAdd = new ArrayList<>();
+            for (int i = 0; i < cards.size(); i ++){
+                boolean halfHidden = false;
+                if (i != cards.size() - 1){
+                    halfHidden = true;
+                }
+                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden, "playingCard");
+                rectsToAdd.add(rectToAdd);
+                if (halfHidden){
+                    initialY += 40;
+                } else {
+                    initialY += 140;
+                }
+            }
+            initialX += 100 + 20;//width of card and of space between tableau stacks
+            tableauRectangles.add(rectsToAdd);
+            gameComponent.updateRectangleObjects(stockRect, wasteRect, tableauRectangles, foundationRectangles);
+        }
+    }
 
     public void play(){
         startUp();
@@ -299,6 +374,10 @@ public class SolitaireGame {
         }
 
         System.out.println(actionStatement);
+    }
+
+    public ArrayList<Card> getStock(){
+        return stock;
     }
 
 
