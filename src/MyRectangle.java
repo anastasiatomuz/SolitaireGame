@@ -112,9 +112,9 @@ public class MyRectangle extends Rectangle {
             g.setColor(Color.WHITE);
 
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
-            if (cardVal.equals("d") || cardVal.equals("h")){
+            if (cardVal.equals("diamonds") || cardVal.equals("hearts")){
                 g.setColor(Color.RED);
-            } else if (cardVal.equals("C") || cardVal.equals("S")) {
+            } else if (cardVal.equals("clubs") || cardVal.equals("spades")) {
                 g.setColor(Color.BLACK);
             }
 

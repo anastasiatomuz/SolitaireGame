@@ -4,9 +4,9 @@ public class SolitairePanel extends JPanel {
     private GameComponent gameComponent;
     private TextPanel textPanel;
 
-    public SolitairePanel(){
+    public SolitairePanel(SolitaireGame solitaireGame){
         textPanel = new TextPanel();
-        gameComponent = new GameComponent(1000, 600,textPanel);
+        gameComponent = new GameComponent(1000, 600, textPanel, solitaireGame);
 
         init();
     }
@@ -20,5 +20,13 @@ public class SolitairePanel extends JPanel {
 
         // add the button panel to the north section of the border layout
         add("South", textPanel); // INHERITED METHOD from a class in JPanel's inheritance hierarchy!
+    }
+
+    public GameComponent getGameComponent(){
+        return gameComponent;
+    }
+
+    public TextPanel getTextPanel(){
+        return textPanel;
     }
 }

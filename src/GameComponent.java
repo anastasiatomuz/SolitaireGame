@@ -14,7 +14,6 @@ public class GameComponent extends JComponent {
 
     private Foundation[] foundations;
 
-    private JLabel picLabel;
 
     private TableauStack[] tableau;
 
@@ -24,21 +23,20 @@ public class GameComponent extends JComponent {
 
     private TextPanel textPanel;
 
-    private ArrayList<MyRectangle> tableauRectangles;
+    private ArrayList<ArrayList<MyRectangle>> tableauRectangles;
 
     private ArrayList<MyRectangle> foundationRectangles;
 
-    public GameComponent(int width, int height, TextPanel textPanel) {
+    public GameComponent(int width, int height, TextPanel textPanel, SolitaireGame solitaireGame) {
         this.width = width;
         this.height = height;
-        solitaireGame = new SolitaireGame();
-        solitaireGame.startUp();
+        this.solitaireGame = solitaireGame;
         tableau = solitaireGame.getTableau();
         foundations = solitaireGame.getFoundations();
         backgroundColor = new Color(45, 166, 16);
         this.textPanel = textPanel;
-        tableauRectangles = new ArrayList<>();
-        foundationRectangles = new ArrayList<>(4);
+//        tableauRectangles = new ArrayList<>();
+//        foundationRectangles = new ArrayList<>(4);
         init();  // call helper method to do rest of setup
     }
 
@@ -55,17 +53,16 @@ public class GameComponent extends JComponent {
 
         // add the mouse listener and mouse motion listener
         addMouseListener(new MyMouseAdapter());
-        /*
-        addMouseMotionListener(new MyMouseMotionAdapter());
-        */
 
+    }
 
-        //testing images
-        picLabel = new JLabel(new ImageIcon("C:\\Users\\student\\IdeaProjects\\SolitaireGraphicsPlayground\\src\\diamond.png"));
-        picLabel.setLocation(100, 100);
-        add(picLabel);
-
-
+    public void updateRectangleObjects(MyRectangle newStock, MyRectangle newWaste,
+                                       ArrayList<ArrayList<MyRectangle>> newTableauRectangles,
+                                       ArrayList<MyRectangle> newFoundationRectangles){
+        stockRect = newStock;
+        wasteRect = newWaste;
+        tableauRectangles = newTableauRectangles;
+        foundationRectangles = newFoundationRectangles;
     }
 
 
@@ -83,11 +80,64 @@ public class GameComponent extends JComponent {
         g.setColor(backgroundColor);
         g.fillRect(0, 0, width, height);
 
+        for (MyRectangle foundRect : foundationRectangles) {
+            if (foundRect.getCard() == null) {
+                try {
+                    foundRect.draw(g, foundRect.getLabel());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    foundRect.draw(g);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        //drawing stock
+        if (stockRect.getCard() != null){
+            if (!stockRect.getCard().isVisible()){
+                try {
+                    stockRect.draw(g, "full");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    stockRect.draw(g);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            try {
+                stockRect.draw(g, "empty");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (ArrayList<MyRectangle> tabStack : tableauRectangles){
+            for (MyRectangle rectToDraw : tabStack){
+                try {
+                    rectToDraw.draw(g);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+
+
+
+        /*
         int initialX = 30;
         int initialY = 23;
         MyRectangle rectToAdd;
-        for (Foundation foundation : foundations){
-            rectToAdd = new MyRectangle(null, new Point(initialX + 20 , initialY), false, foundation.getSuit());
+        for (Foundation foundation : foundations) {
+            rectToAdd = new MyRectangle(null, new Point(initialX + 20, initialY), false, foundation.getSuit());
             initialX += 20 + rectToAdd.getWidth();
             try {
                 rectToAdd.draw(g, foundation.getSuit());
@@ -97,8 +147,10 @@ public class GameComponent extends JComponent {
             }
         }
 
-        //stock
-        stockRect = new MyRectangle(null, new Point(initialX + 200 , initialY), false, "stock");
+        for (MyRectangle foundRect : foundationRectangles)
+
+            //stock
+            stockRect = new MyRectangle(null, new Point(initialX + 200, initialY), false, "stock");
         try {
             stockRect.draw(g, "full");
         } catch (IOException e) {
@@ -114,31 +166,33 @@ public class GameComponent extends JComponent {
 
 
         //tableau
-        initialX = 30 + 20 ;
-        for (TableauStack tableauStack : tableau){
+        initialX = 30 + 20;
+        for (TableauStack tableauStack : tableau) {
             initialY = 23 + 140 + 40;
             ArrayList<Card> cards = tableauStack.getStack();
-            for (int i = 0; i < cards.size(); i ++){
+            for (int i = 0; i < cards.size(); i++) {
                 boolean halfHidden = false;
-                if (i != cards.size() - 1){
-                   halfHidden = true;
+                if (i != cards.size() - 1) {
+                    halfHidden = true;
                 }
-                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX , initialY), halfHidden, "playingCard");
+                rectToAdd = new MyRectangle(cards.get(i), new Point(initialX, initialY), halfHidden, "playingCard");
                 try {
                     rectToAdd.draw(g);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 tableauRectangles.add(rectToAdd);
-                if (halfHidden){
+                if (halfHidden) {
                     initialY += 40;
                 } else {
                     initialY += 140;
                 }
             }
-            initialX += 100 + 20;//width of card and of space between tableau stacks
-        }
+            initialX += 100 + 20;//width of card and of space between tableau stacks\
 
+            */
+
+    }
 
 
 
@@ -169,7 +223,6 @@ public class GameComponent extends JComponent {
 //        }
 
 
-    }
 
 
     class MyMouseAdapter extends MouseAdapter {
@@ -195,19 +248,18 @@ public class GameComponent extends JComponent {
             if (wasteRect.contains(e.getPoint())){
                 textPanel.updateText("You clicked the waste!");
             }
-
-            for (MyRectangle rect : tableauRectangles){
-                if (rect.contains(clickedPoint)){
-                    if (rect.getCard().isVisible()){
-                        textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
-                    } else {
-                        textPanel.updateText("You clicked a card that is hidden");
+            for (ArrayList<MyRectangle> tabStack : tableauRectangles){
+                for (MyRectangle rect : tabStack){
+                    if (rect.contains(clickedPoint)){
+                        if (rect.getCard().isVisible()){
+                            textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+                        } else {
+                            textPanel.updateText("You clicked a card that is hidden");
+                        }
                     }
-
                 }
-
-
             }
+
 
 
             // repaint all
