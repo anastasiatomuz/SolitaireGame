@@ -43,6 +43,17 @@ public class MyRectangle extends Rectangle {
         }
     }
 
+    public Dimension getSMALL_DIMENSION(){
+        return SMALL_DIMENSION;
+    }
+
+    public boolean isFull(){
+        if (currentDimension == FULL_DIMENSION){
+            return true;
+        }
+        return false;
+    }
+
     public void changeCardType(boolean fullSize){
         if (fullSize){
             currentDimension = FULL_DIMENSION;
@@ -63,14 +74,34 @@ public class MyRectangle extends Rectangle {
         return label;
     }
 
+    public Point getStartingPoint(){
+        return startingPoint;
+    }
+
+    public void setStartingPoint(Point newPoint){
+        startingPoint = newPoint;
+    }
+
+
     public void draw(Graphics g) throws IOException {
-        Color color;
-        if (card.isVisible()){
-            color = Color.white;
-        } else {
-            color = Color.pink;
+        if (label.equals("stock")){
+            if (card == null){
+                g.setColor(Color.gray);
+                drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
+            } else {
+                drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
+                generateImage(g, "back_of_card");
+            }
+            return;
         }
-        g.setColor(color);
+
+//        Color color;
+//        if (card.isVisible()){
+//            color = Color.white;
+//        } else {
+//            color = Color.pink;
+//        }
+//        g.setColor(color);
 
         if (halfHidden){
             changeCardType(false);//make card half-hidden dimensions
@@ -78,7 +109,7 @@ public class MyRectangle extends Rectangle {
             if (card.isVisible()){
                 generateCroppedImage(g, card.getImageName());
                 g.setColor(Color.BLACK);
-                g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + smallerHeight /2);
+                //g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + smallerHeight /2);
             } else {
                 generateCroppedImage(g, "back_of_card");
             }
@@ -88,10 +119,10 @@ public class MyRectangle extends Rectangle {
 
             if (card.isVisible()){
                 g.setColor(Color.BLACK);
-                g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + height /2);
+                //g.drawString(card.cardInfo(), startingPoint.x + width/2 - 5, startingPoint.y + height /2);
                 generateImage(g, card.getImageName());
             } else {
-                generateImage(g,"back_of_image");
+                generateImage(g,"back_of_card");
             }
         }
     }
@@ -112,14 +143,20 @@ public class MyRectangle extends Rectangle {
             g.setColor(Color.WHITE);
 
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
-            if (cardVal.equals("diamonds") || cardVal.equals("hearts")){
-                g.setColor(Color.RED);
-            } else if (cardVal.equals("clubs") || cardVal.equals("spades")) {
-                g.setColor(Color.BLACK);
+//            if (cardVal.equals("diamonds") || cardVal.equals("hearts")){
+//                g.setColor(Color.RED);
+//            } else if (cardVal.equals("clubs") || cardVal.equals("spades")) {
+//                g.setColor(Color.BLACK);
+//            }
+            if (card == null){
+                generateImage(g, cardVal);
+            } else {
+                generateImage(g, card.getImageName());
             }
 
+
                 //g.drawImage()
-            g.drawString(cardVal, startingPoint.x + width/2 - 5, startingPoint.y + height /2);
+            //g.drawString(cardVal, startingPoint.x + width/2 - 5, startingPoint.y + height /2);
         }
     }
 
@@ -142,7 +179,6 @@ public class MyRectangle extends Rectangle {
         //https://www.baeldung.com/java-resize-image
         //
         String loc = "/resources/images/" + cardImageName + ".png";
-        System.out.println(cardImageName);
 
         BufferedImage image = ImageIO.read(Objects.requireNonNull(getClass().getResource(loc)));
 

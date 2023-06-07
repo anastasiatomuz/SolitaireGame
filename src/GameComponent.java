@@ -12,10 +12,10 @@ public class GameComponent extends JComponent {
     private Color backgroundColor;
     private SolitaireGame solitaireGame;
 
-    private Foundation[] foundations;
-
-
-    private TableauStack[] tableau;
+//    private Foundation[] foundations;
+//
+//
+//    private TableauStack[] tableau;
 
     private MyRectangle stockRect;
 
@@ -31,8 +31,10 @@ public class GameComponent extends JComponent {
         this.width = width;
         this.height = height;
         this.solitaireGame = solitaireGame;
-        tableau = solitaireGame.getTableau();
-        foundations = solitaireGame.getFoundations();
+        stockRect = new MyRectangle(null, new Point(0,0), false, "full");
+        wasteRect = new MyRectangle(null, new Point(0,0), false, "empty");
+        tableauRectangles = new ArrayList<>();
+        foundationRectangles = new ArrayList<>();
         backgroundColor = new Color(45, 166, 16);
         this.textPanel = textPanel;
 //        tableauRectangles = new ArrayList<>();
@@ -80,6 +82,8 @@ public class GameComponent extends JComponent {
         g.setColor(backgroundColor);
         g.fillRect(0, 0, width, height);
 
+        //intialize rectangle object collections
+
         for (MyRectangle foundRect : foundationRectangles) {
             if (foundRect.getCard() == null) {
                 try {
@@ -119,14 +123,49 @@ public class GameComponent extends JComponent {
             }
         }
 
-        for (ArrayList<MyRectangle> tabStack : tableauRectangles){
-            for (MyRectangle rectToDraw : tabStack){
+        //drawing waste
+        if (wasteRect.getCard() != null){
+            if (!wasteRect.getCard().isVisible()){
                 try {
-                    rectToDraw.draw(g);
+                    wasteRect.draw(g, "full");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    wasteRect.draw(g);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+        } else {
+            try {
+                wasteRect.draw(g, "empty");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (int i = 0; i < tableauRectangles.size(); i ++){
+            ArrayList<MyRectangle> tabStack = tableauRectangles.get(i);
+            if (tabStack.size() == 0){
+                Point[] tabPoints = solitaireGame.getTABLEAU_POINTS();
+                MyRectangle blank = new MyRectangle(null, tabPoints[i], false, "empty");
+                try {
+                    blank.draw(g, "empty");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                for (MyRectangle rectToDraw : tabStack){
+                    try {
+                        rectToDraw.draw(g);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
         }
 
 
@@ -232,46 +271,66 @@ public class GameComponent extends JComponent {
             int currY = e.getY();
             Point clickedPoint = e.getPoint();
 
-            System.out.println("" + currX + " " + currY);
 
+
+            //user clicked stock
+            if (stockRect.contains(e.getPoint())){
+                System.out.println(stockRect.getStartingPoint().x + " " + stockRect.getStartingPoint().y);
+                solitaireGame.processStock();
+            }
+
+            //user clicked waste
+            if (wasteRect.contains(e.getPoint())){
+                textPanel.updateText("You clicked the waste!");
+                System.out.println(wasteRect.getStartingPoint().x + " " + wasteRect.getStartingPoint().y);
+            }
+
+            //user clicked foundations
             for (MyRectangle foundation : foundationRectangles){
                 if (foundation.contains(clickedPoint)){
+                    System.out.println(foundation.getStartingPoint().x + " " + foundation.getStartingPoint().y);
                     textPanel.updateText("you clicked the " + foundation.getLabel() + " foundation!\n" +
                             "You can't move this card!");
                 }
             }
 
-            if (stockRect.contains(e.getPoint())){
-                textPanel.updateText("You clicked the stack!");
-            }
-
-            if (wasteRect.contains(e.getPoint())){
-                textPanel.updateText("You clicked the waste!");
-            }
-            for (ArrayList<MyRectangle> tabStack : tableauRectangles){
-                for (MyRectangle rect : tabStack){
-                    if (rect.contains(clickedPoint)){
+            //user clicked tableau
+            for (int i = 0; i < tableauRectangles.size(); i ++){
+                for (int j = 0; j < tableauRectangles.get(i).size(); j ++){
+                    MyRectangle rect = tableauRectangles.get(i).get(j);
+                    if (rect.contains(e.getPoint())){
+                        System.out.println(rect.isFull());
                         if (rect.getCard().isVisible()){
-                            textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+                            if (j == tableauRectangles.get(i).size() - 1){
+                                solitaireGame.moveOneCard(i);
+                            }
                         } else {
                             textPanel.updateText("You clicked a card that is hidden");
                         }
                     }
+
                 }
             }
 
+//            for (ArrayList<MyRectangle> tabStack : tableauRectangles){
+//                for (MyRectangle rect : tabStack){
+//                    if (rect.contains(clickedPoint)){
+//                        if (rect.getCard().isVisible()){
+//                            textPanel.updateText("You clicked the " + rect.getCard().cardInfo() + " card!");
+//                        } else {
+//                            textPanel.updateText("You clicked a card that is hidden");
+//                        }
+//                    }
+//                }
+//            }
 
+            //check if the user has won
+            solitaireGame.hasWon();
 
             // repaint all
             repaint();
         }
 
-        // Method to handle when the user releases the mouse
-        public void mouseReleased(MouseEvent e) {
-            int currX = e.getX();
-            int currY = e.getY();
-
-        }
     }
 
 //

@@ -19,10 +19,18 @@ public class SolitaireGame {
 
     private ArrayList<MyRectangle> foundationRectangles;
 
-
     private GameComponent gameComponent;
 
     private TextPanel textPanel;
+
+    private final Point STOCK_START_POINT = new Point(710, 23);
+
+    private final Point WASTE_START_POINT = new Point(850, 170);
+
+    private final Point[] FOUNDATION_POINTS = {new Point(50,23), new Point(170,23), new Point(290,23), new Point(410, 23)};
+
+    private final Point[] TABLEAU_POINTS = {new Point(50,203), new Point(170,203), new Point(290,203),
+            new Point(410,203), new Point(530,203), new Point(650,203), new Point(770,203)};
 
     public SolitaireGame(){
         // create a frame (main application window)
@@ -45,6 +53,26 @@ public class SolitaireGame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    public MyRectangle getStockRect(){
+        return stockRect;
+    }
+
+    public MyRectangle getWasteRect(){
+        return wasteRect;
+    }
+
+    public ArrayList<MyRectangle> getFoundationRectangles(){
+        return foundationRectangles;
+    }
+
+    public ArrayList<ArrayList<MyRectangle>> getTableauRectangles(){
+        return tableauRectangles;
+    }
+
+    public Point[] getTABLEAU_POINTS(){
+        return TABLEAU_POINTS;
+    }
+
 
     public void setUpLayout(){
         startUp();
@@ -58,7 +86,7 @@ public class SolitaireGame {
         }
 
         //creating rectangle object for stack and waste piles
-        stockRect = new MyRectangle(null, new Point(initialX + 200 , initialY), false, "stock");
+        stockRect = new MyRectangle(stock.get(stock.size() - 1), new Point(initialX + 200 , initialY), false, "stock");
         wasteRect = new MyRectangle(null, new Point(initialX + 200 + 100 + 40, initialY), false, "waste");
 
 
@@ -83,8 +111,8 @@ public class SolitaireGame {
             }
             initialX += 100 + 20;//width of card and of space between tableau stacks
             tableauRectangles.add(rectsToAdd);
-            gameComponent.updateRectangleObjects(stockRect, wasteRect, tableauRectangles, foundationRectangles);
         }
+        updateRectsOutside();
     }
 
     public void play(){
@@ -111,6 +139,10 @@ public class SolitaireGame {
                 new Foundation("C"), new Foundation("S")};
         stock = new ArrayList<>();
         waste = new ArrayList<>();
+
+        //intializing rectangle object collections
+        tableauRectangles = new ArrayList<>(7);
+        foundationRectangles = new ArrayList<>();
 
 
         //generate a full deck of cards
@@ -199,6 +231,15 @@ public class SolitaireGame {
         System.out.println("=================================================================\n");
     }
 
+    public boolean hasWon(){
+        for (Foundation foundation : foundations){
+            if (foundation.getFoundationStack().size() != 13){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public String displayStack(ArrayList<Card> stackToDisplay){
         if (stackToDisplay.size() == 0){
             return "currently empty";
@@ -226,7 +267,7 @@ public class SolitaireGame {
         System.out.print("What is your choice? ");
         int choice = scan.nextInt();
         if (choice == 1) {
-            moveOneCard();
+            moveOneCard(1);
         } else if (choice == 2){
             moveMultipleCards();
         } else if (choice == 3) {
@@ -251,20 +292,50 @@ public class SolitaireGame {
                 }
             }
             topWasteCard = null;
-
         }
     }
 
-    public void moveOneCard(){
-        System.out.println("Tableau stacks are numbered 1 - 7 from top down");
-        System.out.print("From which stack of the tableau do you want to choose? ");
-        int userMove = scan.nextInt();
-        TableauStack stackFrom = tableau[userMove - 1];
+    public void processStock(){
+        if (stock.size() == 0){
+            if (waste.size() == 0){
+                textPanel.updateText("Cannot move cards to waste or recycle waste because " +
+                        "you have used up all the cards from the waste and stock piles");
+            } else {
+                for (int i = waste.size() - 1; i >= 0; i --){
+                    Card toRemove = waste.remove(i);
+                    toRemove.setVisible(false);
+                    stock.add(toRemove);
+                }
+                stockRect.updateCard(stock.get(stock.size() - 1));
+                wasteRect.updateCard(null);
+                textPanel.updateText("Waste recycled");
+            }
+        } else {
+            Card toMove = stock.remove(stock.size() - 1);
+            textPanel.updateText("" + toMove.cardInfo() + " was added to the stock");
+            toMove.setVisible(true);
+            waste.add(toMove);
+            topWasteCard = waste.get(waste.size() - 1);
+            wasteRect.updateCard(topWasteCard);
+        }
+    }
+
+    public void moveOneCard(int tabNum){
+        TableauStack stackFrom = tableau[tabNum];
         Card cardFrom = stackFrom.getTopCard();
         boolean moved = false;
         String actionStatement = cardFrom.cardInfo();
-        for (Foundation foundation : foundations){
+        for (int i = 0; i < foundations.length; i ++){
+            Foundation foundation = foundations[i];
             if (foundation.addCard(cardFrom)){
+                MyRectangle toMove = tableauRectangles.get(tabNum).remove(tableauRectangles.get(tabNum).size() - 1);
+                if (tableauRectangles.get(tabNum).size() > 0){
+                    MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
+                    revealed.changeCardType(true);
+                    revealed.getCard().setVisible(false);
+                }
+                toMove.setStartingPoint(FOUNDATION_POINTS[i]);
+                toMove.updateCard(foundation.foundationStack.get(foundation.foundationStack.size() - 1));
                 stackFrom.removeTopCard();
                 moved = true;
                 actionStatement += " moved to " + foundation.getSuit() + " foundation";
@@ -276,9 +347,43 @@ public class SolitaireGame {
             for (int i = 0; i < tableau.length; i ++){
                 TableauStack tableauStack = tableau[i];
                 if (tableauStack.addOneCard(cardFrom)){
-                    stackFrom.removeTopCard();
+                    //rectangle graphics object removed from old loc to new stack
+                    MyRectangle rectMoved = tableauRectangles.get(tabNum).remove(tableauRectangles.get(tabNum).size() - 1);
+
+                    if (tableauRectangles.get(tabNum).size() > 0){
+                        MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
+                        System.out.println(revealed.getCard().cardInfo());
+                        revealed.changeCardType(true);
+                        System.out.println("yes");
+                        revealed.getCard().setVisible(false);
+                    }
+
+                    if (tableauRectangles.get(i).size() == 0){
+                        tableauRectangles.get(i).add(rectMoved);
+                        rectMoved.setStartingPoint(TABLEAU_POINTS[i]);
+                    } else {
+                        MyRectangle prev = tableauRectangles.get(i).get(tableauRectangles.get(i).size() - 1);
+                        prev.changeCardType(true);
+                        rectMoved.setStartingPoint(new Point(prev.getStartingPoint().x,
+                                prev.getStartingPoint().y + prev.getSMALL_DIMENSION().height));
+                        tableauRectangles.get(i).add(rectMoved);
+                    }
+
+
+                    stackFrom.removeTopCard(); //card object moved in logic lists
                     moved = true;
-                    tableauStack.displayStack();
+
+
+//                    //updates the rect object that is newly revealed
+//                    if (tableauRectangles.get(i).size() > 0){
+//                        MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
+//                        revealed.changeCardType(true);
+//                        revealed.getCard().setVisible(true);
+//                    }
+
+
+
+
                     actionStatement += " moved to tableau stack #" + (i+1);
                     break;
                 }
@@ -288,11 +393,19 @@ public class SolitaireGame {
         if (!moved){
             actionStatement += " was unable to be moved. Try another card";
         }
-        System.out.println(actionStatement);
+        textPanel.updateText(actionStatement);
+        updateRectsOutside();
+
     }
 
     public void moveCardFromWaste(){
         boolean moved = false;
+        if (waste.size() == 0){
+            textPanel.updateText("Cannot move card anywhere because waste is empty.");
+            return;
+        }
+
+
         String actionStatement = topWasteCard.cardInfo();
         for (Foundation foundation : foundations){
             if (foundation.addCard(topWasteCard)){
@@ -303,6 +416,7 @@ public class SolitaireGame {
                     topWasteCard = waste.get(waste.size() - 1);
                 }
                 moved = true;
+                wasteRect.updateCard(topWasteCard);
                 actionStatement += " moved to " + foundation.getSuit() + " foundation";
                 break;
             }
@@ -318,6 +432,7 @@ public class SolitaireGame {
                     } else {
                         topWasteCard = waste.get(waste.size() - 1);
                     }
+                    wasteRect.updateCard(topWasteCard);
                     moved = true;
                     tableauStack.displayStack();
                     actionStatement += " moved to tableau stack #" + (i+1);
@@ -329,7 +444,8 @@ public class SolitaireGame {
         if (!moved){
             actionStatement += " was unable to be moved. Try another card";
         }
-        System.out.println(actionStatement);
+        textPanel.updateText(actionStatement);
+        updateRectsOutside();
     }
 
     public void moveMultipleCards(){
@@ -380,5 +496,8 @@ public class SolitaireGame {
         return stock;
     }
 
+    public void updateRectsOutside(){
+        gameComponent.updateRectangleObjects(stockRect, wasteRect, tableauRectangles, foundationRectangles);
+    }
 
 }

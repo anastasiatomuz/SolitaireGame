@@ -3,7 +3,6 @@ public class Card {
     private String value;
     private boolean visible;
 
-    private MyRectangle rectangle;
 
     /**
      * Creates a Card object to hold the information for each of the 52 cards
@@ -16,7 +15,6 @@ public class Card {
         this.suit = suit;//
         this.value = value;
         this.visible = visible;
-        this.rectangle = null;
     }
 
     public String getSuit(){
@@ -27,16 +25,16 @@ public class Card {
         return value;
     }
 
-    public void setRectangle(MyRectangle newRect){
-        rectangle = newRect;
-    }
-
     public void flip(){
         visible = !visible;
     }
 
     public boolean isVisible(){
         return visible;
+    }
+
+    public void setVisible(boolean newVisible){
+        visible = newVisible;
     }
 
     public int getNumbericalValue(){

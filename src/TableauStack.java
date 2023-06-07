@@ -40,7 +40,7 @@ public class TableauStack {
     public Card removeTopCard(){
         Card resultingCard = stack.remove(stack.size() - 1);
         if (stack.size() != 0 && !getTopCard().isVisible()){
-            getTopCard().flip();
+            getTopCard().setVisible(true);
         }
         return resultingCard;
     }
