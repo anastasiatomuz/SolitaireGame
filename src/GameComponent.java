@@ -86,7 +86,7 @@ public class GameComponent extends JComponent {
 
         for (MyRectangle foundRect : foundationRectangles) {
             if (foundRect.getCard() == null) {
-                System.out.println(foundRect.getLabel() + " is empty");
+                //System.out.println(foundRect.getLabel() + " is empty");
                 try {
                     foundRect.draw(g, foundRect.getLabel());
                 } catch (IOException e) {
@@ -148,7 +148,7 @@ public class GameComponent extends JComponent {
             }
         }
 
-        //System.out.println("----------------------");
+        System.out.println("----------------------");
         for (int i = 0; i < tableauRectangles.size(); i ++){
             ArrayList<MyRectangle> tabStack = tableauRectangles.get(i);
             if (tabStack.size() == 0){
@@ -161,7 +161,7 @@ public class GameComponent extends JComponent {
                 }
             } else {
                 for (MyRectangle rectToDraw : tabStack){
-                    //rectToDraw.someInfo();
+                    rectToDraw.someInfo();
                     try {
                         rectToDraw.draw(g);
                     } catch (IOException e) {
@@ -169,9 +169,9 @@ public class GameComponent extends JComponent {
                     }
                 }
             }
-            //System.out.println();
+            System.out.println();
         }
-        //System.out.println("----------------------");
+        System.out.println("----------------------");
 
 
 
