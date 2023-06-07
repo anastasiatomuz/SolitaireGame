@@ -325,18 +325,19 @@ public class SolitaireGame {
         Card cardFrom = stackFrom.getTopCard();
         boolean moved = false;
         String actionStatement = cardFrom.cardInfo();
-        for (int i = 0; i < foundations.length; i ++){
+        for (int i = 0; i < foundations.length; i ++){ //got through 4 suits of fundations
             Foundation foundation = foundations[i];
             if (foundation.addCard(cardFrom)){
                 MyRectangle toMove = tableauRectangles.get(tabNum).remove(tableauRectangles.get(tabNum).size() - 1);
                 if (tableauRectangles.get(tabNum).size() > 0){
                     MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
-                    revealed.changeCardType(true);
-                    revealed.getCard().setVisible(false);
+                    revealed.setHalfHidden(false);
+                    revealed.getCard().setVisible(true);
                 }
                 toMove.setStartingPoint(FOUNDATION_POINTS[i]);
-                toMove.updateCard(foundation.foundationStack.get(foundation.foundationStack.size() - 1));
-                stackFrom.removeTopCard();
+                foundationRectangles.get(i).updateCard(foundation.getFoundationStack().get(foundation.getFoundationStack().size() - 1));
+                //toMove.updateCard(foundation.getFoundationStack().get(foundation.getFoundationStack().size() - 1));
+                stackFrom.removeTopCard(); //removes top card of logic place
                 moved = true;
                 actionStatement += " moved to " + foundation.getSuit() + " foundation";
                 break;
@@ -353,7 +354,7 @@ public class SolitaireGame {
                     if (tableauRectangles.get(tabNum).size() > 0){
                         MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
                         System.out.println(revealed.getCard().cardInfo());
-                        revealed.changeCardType(true);
+                        revealed.setHalfHidden(false);
                         System.out.println("yes");
                         revealed.getCard().setVisible(false);
                     }
@@ -363,7 +364,7 @@ public class SolitaireGame {
                         rectMoved.setStartingPoint(TABLEAU_POINTS[i]);
                     } else {
                         MyRectangle prev = tableauRectangles.get(i).get(tableauRectangles.get(i).size() - 1);
-                        prev.changeCardType(true);
+                        prev.setHalfHidden(true);
                         rectMoved.setStartingPoint(new Point(prev.getStartingPoint().x,
                                 prev.getStartingPoint().y + prev.getSMALL_DIMENSION().height));
                         tableauRectangles.get(i).add(rectMoved);
@@ -407,7 +408,8 @@ public class SolitaireGame {
 
 
         String actionStatement = topWasteCard.cardInfo();
-        for (Foundation foundation : foundations){
+        for (int i = 0; i < foundations.length; i ++){
+            Foundation foundation = foundations[i];
             if (foundation.addCard(topWasteCard)){
                 waste.remove(waste.size() - 1);
                 if (waste.size() == 0){
@@ -415,6 +417,7 @@ public class SolitaireGame {
                 } else {
                     topWasteCard = waste.get(waste.size() - 1);
                 }
+                foundationRectangles.get(i).updateCard(foundation.getFoundationStack().get(foundation.getFoundationStack().size() - 1));
                 moved = true;
                 wasteRect.updateCard(topWasteCard);
                 actionStatement += " moved to " + foundation.getSuit() + " foundation";
@@ -426,13 +429,20 @@ public class SolitaireGame {
             for (int i = 0; i < tableau.length; i ++){
                 TableauStack tableauStack = tableau[i];
                 if (tableauStack.addOneCard(topWasteCard)){
-                    waste.remove(waste.size() - 1);
+                    Card removed = waste.remove(waste.size() - 1);
+
                     if (waste.size() == 0){
                         topWasteCard = null;
                     } else {
                         topWasteCard = waste.get(waste.size() - 1);
                     }
                     wasteRect.updateCard(topWasteCard);
+                    MyRectangle prev = tableauRectangles.get(i).get(tableauRectangles.get(i).size() - 1);
+                    prev.setHalfHidden(true);
+                    Point p = new Point(prev.getStartingPoint().x,
+                            prev.getStartingPoint().y + prev.getSMALL_DIMENSION().height);
+                    MyRectangle fromWaste = new MyRectangle(removed, p, false, removed.cardInfo());
+                    tableauRectangles.get(i).add(fromWaste);
                     moved = true;
                     tableauStack.displayStack();
                     actionStatement += " moved to tableau stack #" + (i+1);

@@ -62,6 +62,7 @@ public class MyRectangle extends Rectangle {
         }
         setBounds(startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
     }
+
     public void updateCard(Card newCard){
         card = newCard;
     }
@@ -80,6 +81,22 @@ public class MyRectangle extends Rectangle {
 
     public void setStartingPoint(Point newPoint){
         startingPoint = newPoint;
+    }
+
+    public void someInfo(){
+        if (card != null){
+            System.out.print(card.cardInfo() + " ");
+        } else {
+            System.out.println(label);
+        }
+        System.out.println(isFull());
+    }
+
+    public void setHalfHidden(boolean isSmaller){
+        halfHidden = isSmaller;
+        if (halfHidden){
+            currentDimension = SMALL_DIMENSION;
+        }
     }
 
 

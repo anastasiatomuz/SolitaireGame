@@ -86,12 +86,14 @@ public class GameComponent extends JComponent {
 
         for (MyRectangle foundRect : foundationRectangles) {
             if (foundRect.getCard() == null) {
+                System.out.println(foundRect.getLabel() + " is empty");
                 try {
                     foundRect.draw(g, foundRect.getLabel());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
+                System.out.println(foundRect.getLabel() + " has " + foundRect.getCard().cardInfo());
                 try {
                     foundRect.draw(g);
                 } catch (IOException e) {
@@ -100,7 +102,7 @@ public class GameComponent extends JComponent {
             }
         }
 
-        //drawing stock
+
         if (stockRect.getCard() != null){
             if (!stockRect.getCard().isVisible()){
                 try {
@@ -146,6 +148,7 @@ public class GameComponent extends JComponent {
             }
         }
 
+        //System.out.println("----------------------");
         for (int i = 0; i < tableauRectangles.size(); i ++){
             ArrayList<MyRectangle> tabStack = tableauRectangles.get(i);
             if (tabStack.size() == 0){
@@ -158,6 +161,7 @@ public class GameComponent extends JComponent {
                 }
             } else {
                 for (MyRectangle rectToDraw : tabStack){
+                    //rectToDraw.someInfo();
                     try {
                         rectToDraw.draw(g);
                     } catch (IOException e) {
@@ -165,8 +169,10 @@ public class GameComponent extends JComponent {
                     }
                 }
             }
-
+            //System.out.println();
         }
+        //System.out.println("----------------------");
+
 
 
 
@@ -281,7 +287,7 @@ public class GameComponent extends JComponent {
 
             //user clicked waste
             if (wasteRect.contains(e.getPoint())){
-                textPanel.updateText("You clicked the waste!");
+                solitaireGame.moveCardFromWaste();
                 System.out.println(wasteRect.getStartingPoint().x + " " + wasteRect.getStartingPoint().y);
             }
 

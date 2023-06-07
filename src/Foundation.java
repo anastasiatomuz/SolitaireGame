@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Foundation {
     private final String SUIT;
-    ArrayList<Card> foundationStack;
+    private ArrayList<Card> foundationStack;
 
     public Foundation(String suit){
         this.SUIT = suit;
@@ -25,6 +25,7 @@ public class Foundation {
     public boolean foundationCompleted(){
         return foundationStack.size() == 13;
     }
+
 
     /**
      * Attempts to add a card to the foundation stack.
