@@ -269,7 +269,7 @@ public class SolitaireGame {
         if (choice == 1) {
             moveOneCard(1);
         } else if (choice == 2){
-            moveMultipleCards();
+            moveMultipleCards(1,1);
         } else if (choice == 3) {
             if (stock.size() == 0) {
                 System.out.println("Cannot bring up new card to waste. Must recycle waste first.");
@@ -351,12 +351,12 @@ public class SolitaireGame {
                     //rectangle graphics object removed from old loc to new stack
                     MyRectangle rectMoved = tableauRectangles.get(tabNum).remove(tableauRectangles.get(tabNum).size() - 1);
 
+
                     if (tableauRectangles.get(tabNum).size() > 0){
                         MyRectangle revealed = tableauRectangles.get(tabNum).get(tableauRectangles.get(tabNum).size() - 1);
                         System.out.println(revealed.getCard().cardInfo());
                         revealed.setHalfHidden(false);
-                        System.out.println("yes");
-                        revealed.getCard().setVisible(false);
+                        revealed.getCard().setVisible(true);
                     }
 
                     if (tableauRectangles.get(i).size() == 0){
@@ -458,22 +458,53 @@ public class SolitaireGame {
         updateRectsOutside();
     }
 
-    public void moveMultipleCards(){
-        String actionStatement = "";
-        System.out.println("Tableau stacks are numbered 1 - 7 from top down");
-        System.out.print("From which stack of the tableau do you want to choose? ");
-        int userMove = scan.nextInt();
-        TableauStack stackFrom = tableau[userMove - 1];
+    public void moveMultipleRects(int tabLoc, int locFromBottom, int locTo){
+        ArrayList<MyRectangle> multipleRectsToMove = new ArrayList<>();
+        for (int i = locFromBottom; i < tableauRectangles.get(tabLoc).size(); i ++){
+            MyRectangle rectToMove = tableauRectangles.get(tabLoc).remove(i);
+            multipleRectsToMove.add(rectToMove);
+        }
+        if (tableau[tabLoc].getStack().size() > 0){
+            MyRectangle revealed = tableauRectangles.get(tabLoc).get(tableauRectangles.get(tabLoc).size() - 1);
+            System.out.println(revealed.getCard().cardInfo());
+            revealed.setHalfHidden(false);
+            revealed.getCard().setVisible(true);
+            System.out.println("yes");
+            revealed.getCard().setVisible(false);
+        }
 
-        System.out.println("Cards in a stack can be numbered with \"1\" being the top card.");
-        System.out.println("The bottom card you choose must be no greater than the amount of cards in the stack " +
-                "and must not be a hidden card");
-        System.out.print("What is the number associated with the bottom card of the set of cards you wish to move? ");
+        if (tableauRectangles.get(locTo).size() == 0){
+            Point startingPoint = TABLEAU_POINTS[locTo];
+            for (int i = 0; i < multipleRectsToMove.size(); i ++){
+                MyRectangle toMove = multipleRectsToMove.get(i);
+                if (i == 0){
+                    toMove.setStartingPoint(startingPoint);
+                } else {
+                    toMove.setStartingPoint(new Point(startingPoint.x + 40*(i+1), startingPoint.y));
+                }
+                tableauRectangles.get(locTo).add(toMove);
+            }
+        } else {
+            MyRectangle prev = tableauRectangles.get(locTo).get(tableauRectangles.get(locTo).size() - 1);
+            Point fromPoint = prev.getStartingPoint();
+            prev.setHalfHidden(true);
+            for (int i = 0; i < multipleRectsToMove.size(); i ++) {
+                MyRectangle toMove = multipleRectsToMove.get(i);
+                toMove.setStartingPoint(new Point(fromPoint.x + 40*(i+1), fromPoint.y));
+                tableauRectangles.get(tabLoc).add(toMove);
+            }
+        }
+    }
+
+    public void moveMultipleCards(int tabLoc, int locFromBottom){
+        String actionStatement = "";
+        TableauStack stackFrom = tableau[tabLoc];
+
+
+        int locFromTop = stackFrom.getStack().size() - locFromBottom;
         int userBottom = scan.nextInt();
         //user chose a number greater than the length of the tableau stack OR the card the user chose was hidden
-        if (userBottom > stackFrom.getStack().size()){
-            actionStatement = "You chose a number greater than the length of the stack";
-        } else if (!stackFrom.getBottomCardOfSet(userBottom).isVisible()){
+        if (!stackFrom.getBottomCardOfSet(userBottom).isVisible()){
             actionStatement = "The card you have chosen cannot be moved because it is still hidden.";
         } else {
             Card cardFrom = stackFrom.getBottomCardOfSet(userBottom);
@@ -481,10 +512,11 @@ public class SolitaireGame {
             boolean moved = false;
             actionStatement = "The set of cards with the bottom card of " + cardFrom.cardInfo();
 
-
+            int locFound = 0;
             for (int i = 0; i < tableau.length; i ++){
                 TableauStack tableauStack = tableau[i];
                 if (tableauStack.addMultipleCards(cardsToMove)){
+                    locFound = i;
                     stackFrom.removeMultipleCards(userBottom);
                     moved = true;
                     tableauStack.displayStack();
@@ -493,13 +525,14 @@ public class SolitaireGame {
                 }
             }
 
-
             if (!moved){
                 actionStatement += " was unable to be moved. Try another card";
+            } else {
+                moveMultipleRects(tabLoc, locFromBottom, locFound);
             }
         }
-
-        System.out.println(actionStatement);
+        textPanel.updateText(actionStatement);
+        updateRectsOutside();
     }
 
     public ArrayList<Card> getStock(){
@@ -507,6 +540,16 @@ public class SolitaireGame {
     }
 
     public void updateRectsOutside(){
+        for (int i = 0; i < tableauRectangles.size(); i ++){
+            ArrayList<MyRectangle> list = tableauRectangles.get(i);
+            for (int j = 0; j < list.size(); j ++){
+                MyRectangle toLookAt = list.get(j);
+                if (j != 0 && j == list.size() - 1){
+                    toLookAt.getCard().setVisible(true);
+                }
+            }
+
+        }
         gameComponent.updateRectangleObjects(stockRect, wasteRect, tableauRectangles, foundationRectangles);
     }
 
