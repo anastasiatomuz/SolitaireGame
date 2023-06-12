@@ -17,10 +17,9 @@ public class TextPanel extends JPanel {
         add(messageLabel);
 
 
-        messageArea = new JTextArea("No message yet", 4, 60);
+        messageArea = new JTextArea("Welcome to solitaire\nPlease click a card to move it", 4, 60);
         messageArea.setEditable(true);
         add(messageArea);
-        updateText("testing testing");
 
 
         // initialize the panel using the init() private helper method

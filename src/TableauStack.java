@@ -56,6 +56,9 @@ public class TableauStack {
     }
 
     public Card getTopCard(){
+        if (stack.isEmpty()){
+            return null;
+        }
         return stack.get(stack.size() - 1);
     }
 

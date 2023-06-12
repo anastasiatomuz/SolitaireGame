@@ -57,6 +57,32 @@ public class Card {
         return getValue() + getSuit();
     }
 
+    public String getCardName(){
+        String name = "";
+        if (value.equals("A")){
+            name += "ace of ";
+        } else if (value.equals("J")){
+            name += "jack of ";
+        } else if (value.equals("Q")){
+            name += "queen of ";
+        } else if (value.equals("K")){
+            name += "king of ";
+        } else {
+            name += "" + value + " of ";
+        }
+
+        if (suit.equals("d")){
+            name += "diamonds";
+        } else if (suit.equals("h")){
+            name += "hearts";
+        } else if (suit.equals("S")){
+            name += "spades";
+        } else {
+            name += "clubs";
+        }
+        return name;
+    }
+
     public String getColor(){
         if (suit.equals("d") || suit.equals("h")){
             return "red";

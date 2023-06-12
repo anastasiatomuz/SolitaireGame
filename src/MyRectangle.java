@@ -89,13 +89,15 @@ public class MyRectangle extends Rectangle {
         } else {
             System.out.println(label);
         }
-        System.out.println(isFull());
+        System.out.println(card.isVisible());
     }
 
     public void setHalfHidden(boolean isSmaller){
         halfHidden = isSmaller;
         if (halfHidden){
             currentDimension = SMALL_DIMENSION;
+        } else {
+            currentDimension = FULL_DIMENSION;
         }
     }
 
@@ -145,26 +147,23 @@ public class MyRectangle extends Rectangle {
     }
 
     public void draw(Graphics g, String cardVal) throws IOException {
+
         if (cardVal.equals("empty")) {
             g.setColor(Color.GRAY);
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
 
-
-
-        } else if (cardVal.equals("full")){
+        } else if (cardVal.equals("full")) {
             g.setColor(Color.PINK);
-            drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
+            drawCardAndOutline(g, startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
             generateImage(g, "back_of_card");
+        } else if (cardVal.equals("initial")){
+            g.setColor(Color.green);
         } else {
             // set the color
             g.setColor(Color.WHITE);
 
             drawCardAndOutline(g,startingPoint.x, startingPoint.y, currentDimension.width, currentDimension.height);
-//            if (cardVal.equals("diamonds") || cardVal.equals("hearts")){
-//                g.setColor(Color.RED);
-//            } else if (cardVal.equals("clubs") || cardVal.equals("spades")) {
-//                g.setColor(Color.BLACK);
-//            }
+
             if (card == null){
                 generateImage(g, cardVal);
             } else {
